@@ -1,5 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
+import CookieClicker from './CookieClicker';
 
 function App() {
   return (
