@@ -8,17 +8,28 @@ import {
   Container,
   Grid,
   Card,
+  Button,
 } from "@material-ui/core";
+import cookieImagePath from "./resources/cookie.png";
 
 export default function CookieClicker() {
   const defaultNumDecimalPlaces = 2;
-  const [score, setScore] = React.useState(10);
+  const [score, setScore] = React.useState(0);
   const [generators, setGenerators] = React.useState(originalGenerators);
-  const generateCookies = () => {
+
+  const getCPS = () => {
     var scoreIncrease = 0;
     for (var generator of generators) {
       scoreIncrease += generator.number * generator.cookiesPerSecond;
     }
+    return scoreIncrease;
+  };
+
+  const getCPSWithNewGenerator = (generator) => {
+    return getCPS() + generator.cookiesPerSecond;
+  };
+  const generateCookies = () => {
+    var scoreIncrease = getCPS();
 
     setScore((prevScore) => prevScore + scoreIncrease);
   };
@@ -60,9 +71,14 @@ export default function CookieClicker() {
     <div className="App">
       <h1>Cookie Clicker</h1>
       cookies: {round(score)} <br />
-      <h3>
-        <label onClick={getCookie}>Click here to get a cookie </label>
-      </h3>
+      <img
+        alt="cookie"
+        src={cookieImagePath}
+        onClick={getCookie}
+        style={{ width: 200, height: 200 }}
+      ></img>
+      <br />
+      <label>Cookies per second: {getCPS()}</label>
       <br />
       {generators.map((generator, index) => {
         return (
@@ -74,7 +90,7 @@ export default function CookieClicker() {
               justify="center"
               alignItems="center"
             >
-              <Grid item xs={3}>
+              <Grid item md={3} xs={9}>
                 <List>
                   <Card>
                     <ListItem>
@@ -87,26 +103,28 @@ export default function CookieClicker() {
                           " cookies.)"
                         }
                         secondary={
-                          "Number of " +
-                          generator.name +
-                          "s owned: " +
+                          "Generates " +
+                          generator.cookiesPerSecond +
+                          " cookies every second. owned: " +
                           generator.number
                         }
                       ></ListItemText>
 
                       <ListItemSecondaryAction>
-                        <h1>
-                          <label
-                            style={
-                              getGeneratorCost(generator) > score
-                                ? { color: "white" }
-                                : { color: "black" }
-                            }
-                            onClick={() => getGenerator(generator)}
-                          >
-                            +
+                        {getGeneratorCost(generator) > score ? (
+                          <label style={{ color: "gray" }}>
+                            NOT ENOUGH COOKIES
                           </label>
-                        </h1>
+                        ) : (
+                          <label onClick={() => getGenerator(generator)}>
+                            <Button variant="contained">
+                              BUY (-{round(getGeneratorCost(generator))} cookies
+                              )
+                            </Button>{" "}
+                            <br />
+                            new CPS: {getCPSWithNewGenerator(generator)}
+                          </label>
+                        )}
                       </ListItemSecondaryAction>
                     </ListItem>
                   </Card>
